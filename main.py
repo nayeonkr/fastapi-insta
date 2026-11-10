@@ -41,6 +41,16 @@ class User(Base):
   username: Mapped[str] = mapped_column(unique=True)
   password_hash: Mapped[str]
 
+
+class UserSession(Base):
+  __tablename__ = 'sessions'
+  
+  # 신분증 
+  id: Mapped[str] =mapped_column(primary_key=True)
+  user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+  created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+  user:Mapped['User'] = relationship()
+
 app = FastAPI()
 templates = Jinja2Templates(directory='templates')
 password_hash = PasswordHash.recommended()
@@ -199,3 +209,14 @@ def signup(
   db.commit()
 
   return RedirectResponse('/login', status_code=303)
+
+@app.get('/login')
+def login_form(reqeast: Request):
+  return templates.TemplateResponse(
+    reqeast=reqeast,
+    name='login.html'
+  )
+
+@app.post('/login')
+def login():
+  pass
